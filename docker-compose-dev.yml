@@ -1,0 +1,9 @@
+services:
+  db:
+    image: postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=union
+      - POSTGRES_PASSWORD=union
+    ports:
+      - "6969:5432"
