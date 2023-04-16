@@ -7,8 +7,6 @@ use diesel::{
     QueryDsl, RunQueryDsl,
 };
 
-use diesel::dsl::*;
-
 impl Statistics for PooledConnection<ConnectionManager<PgConnection>> {
     fn get_total_users(&mut self) -> Result<i64, UserError> {
         use crate::schema::users::dsl::*;

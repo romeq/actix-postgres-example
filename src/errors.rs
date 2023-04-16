@@ -8,6 +8,8 @@ use thiserror::Error;
 pub enum UserError {
     #[error("Internal error")]
     InternalError,
+    #[error("")]
+    InvalidBody,
 }
 
 impl ResponseError for UserError {
