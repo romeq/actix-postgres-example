@@ -1,6 +1,20 @@
-use diesel::{PgConnection, RunQueryDsl, prelude::*};
+use crate::errors::UserError;
 
-pub fn get_number_of_users(conn: &mut PgConnection) -> Result<i64, diesel::result::Error> {
-    use crate::schema::users::dsl::*;
-    users.select(diesel::dsl::count(username)).first::<i64>(conn)
+use super::db::Statistics;
+use diesel::{
+    pg::PgConnection,
+    r2d2::{ConnectionManager, PooledConnection},
+    QueryDsl, RunQueryDsl,
+};
+
+use diesel::dsl::*;
+
+impl Statistics for PooledConnection<ConnectionManager<PgConnection>> {
+    fn get_total_users(&mut self) -> Result<i64, UserError> {
+        use crate::schema::users::dsl::*;
+        users
+            .count()
+            .first::<i64>(self)
+            .map_err(|_| UserError::InternalError)
+    }
 }

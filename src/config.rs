@@ -20,7 +20,9 @@ pub struct Database {
 
 impl Config {
     pub fn new(path: &str) -> Config {
-        let content = std::fs::read_to_string(path).expect("Failed to read configuration file");
+        let content = std::fs::read_to_string(path)
+            .expect("Failed to read configuration file");
+
         return toml::from_str::<Config>(content.as_str())
             .expect("Some required values are missing from your configuration file.");
     }

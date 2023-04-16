@@ -1,19 +1,24 @@
-use crate::database::users::*;
-use actix_web::{get, web::{Data, block}, Responder};
-use crate::DbPool;
+use crate::{database::db::Database, errors::*};
+use actix_web::{
+    get,
+    web::{block, Data, Json},
+};
+use serde::Serialize;
 
-#[get("/")]
-pub async fn statistics(db_pool: Data<DbPool>) -> impl Responder {
-    let user_num: i64 = match block(move || {
-        let mut f = db_pool.get().unwrap();
-        get_number_of_users(&mut f).unwrap()
-    }).await {
-        Ok(result) => result,
-        Err(err) => {
-            println!("error: {}", err);
-            0
-        },
-    };
+#[derive(Serialize)]
+pub struct StatisticsResponse {
+    pub user_count: u64,
+}
 
-    user_num.to_string()
+#[get("/users")]
+pub async fn statistics(db_pool: Data<Database>) -> Result<Json<StatisticsResponse>, UserError> {
+    let result = block(move || db_pool.get()?.get_total_users()).await;
+
+    if let Ok(Ok(user_count)) = result {
+        Ok(Json(StatisticsResponse {
+            user_count: user_count as u64,
+        }))
+    } else {
+        Err(UserError::InternalError)
+    }
 }
