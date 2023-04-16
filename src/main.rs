@@ -26,7 +26,7 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .app_data(Data::new(database::db::Database { db: pool.clone() }))
             .wrap(Logger::new("%a -> %r --- HTTP %s, took %Dms"))
-            .service(api::users::statistics)
+            .service(api::statistics::statistics)
     })
     .bind(addr)
     .expect("failed to bind")

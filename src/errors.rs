@@ -1,4 +1,5 @@
 use actix_web::{
+    error::BlockingError,
     http::{header::ContentType, StatusCode},
     HttpResponse, ResponseError,
 };
@@ -8,8 +9,14 @@ use thiserror::Error;
 pub enum UserError {
     #[error("Internal error")]
     InternalError,
-    #[error("")]
+    #[error("Request includes invalid body")]
     InvalidBody,
+}
+
+impl std::convert::From<BlockingError> for UserError {
+    fn from(_: BlockingError) -> Self {
+        UserError::InternalError
+    }
 }
 
 impl ResponseError for UserError {

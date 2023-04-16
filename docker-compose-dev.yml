@@ -3,7 +3,7 @@ services:
     image: postgres
     restart: unless-stopped
     environment:
-      - POSTGRES_USER=union
-      - POSTGRES_PASSWORD=union
+      - POSTGRES_USER=derive
+      - POSTGRES_PASSWORD=cloud
     ports:
       - "6969:5432"

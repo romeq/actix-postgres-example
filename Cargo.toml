@@ -1,5 +1,5 @@
 [package]
-name = "union"
+name = "derive-cloud"
 version = "0.1.0"
 edition = "2021"
 

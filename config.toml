@@ -3,4 +3,4 @@ host = "127.0.0.1"
 port = 8080
 
 [database]
-postgres_url = "postgres://union:union@localhost:6969/union-db"
+postgres_url = "postgres://derive:cloud@localhost:6969/derive-cloud"
