@@ -12,7 +12,7 @@ impl Statistics for PooledConnection<ConnectionManager<PgConnection>> {
         use crate::schema::users::dsl::*;
         users
             .count()
-            .first::<i64>(self)
+            .get_result::<i64>(self)
             .map_err(|_| UserError::InternalError)
     }
 }

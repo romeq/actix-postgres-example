@@ -7,7 +7,7 @@ use serde::Serialize;
 
 #[derive(Serialize)]
 pub struct StatisticsResponse {
-    pub user_count: u64,
+    pub user_count: i64,
 }
 
 #[get("/users")]
@@ -15,6 +15,6 @@ pub async fn statistics(db: Data<Database>) -> Result<Json<StatisticsResponse>, 
     let result = block(move || db.get()?.get_total_users()).await??;
 
     Ok(Json(StatisticsResponse {
-        user_count: result as u64,
+        user_count: result as i64,
     }))
 }
