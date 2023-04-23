@@ -1,9 +1,6 @@
 [package]
-name = "lifetree-backend"
+name = "actix-postgres-example"
 version = "0.1.0"
-authors = ["Touko Valkonen <me@tova.fi>"]
-description = "Backend for Lifetree"
-publish = false
 readme = "README.md"
 edition = "2021"
 
