@@ -1,6 +1,10 @@
 [package]
-name = "derive-cloud"
+name = "lifetree-backend"
 version = "0.1.0"
+authors = ["Touko Valkonen <me@tova.fi>"]
+description = "Backend for Lifetree"
+publish = false
+readme = "README.md"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -13,3 +17,5 @@ serde = { version = "1.0", features = ["derive"] }
 env_logger = "0.10"
 derive_more = "0.99.17"
 thiserror = "1.0"
+rust-argon2 = "1.0.0"
+rand = "0.8.5"

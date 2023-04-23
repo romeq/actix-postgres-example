@@ -9,8 +9,12 @@ use thiserror::Error;
 pub enum UserError {
     #[error("Internal error")]
     InternalError,
-    #[error("Request includes invalid body")]
-    InvalidBody,
+    #[error("User already exists or the request is invalid")]
+    UserAlreadyExistsOrRequestInvalid,
+    #[error("Invalid request")]
+    InvalidRequest,
+    #[error("Permission denied")]
+    PermissionDenied,
 }
 
 impl std::convert::From<BlockingError> for UserError {
@@ -19,16 +23,25 @@ impl std::convert::From<BlockingError> for UserError {
     }
 }
 
+#[derive(serde::Serialize)]
+struct JsonErrorResponse {
+    error_message: String,
+}
+
 impl ResponseError for UserError {
     fn error_response(&self) -> HttpResponse {
         HttpResponse::build(self.status_code())
             .insert_header(ContentType::json())
-            .body(self.to_string())
+            .json(JsonErrorResponse {
+                error_message: self.to_string(),
+            })
     }
 
     fn status_code(&self) -> StatusCode {
         match *self {
             Self::InternalError => StatusCode::INTERNAL_SERVER_ERROR,
+            Self::UserAlreadyExistsOrRequestInvalid => StatusCode::CONFLICT,
+            Self::PermissionDenied => StatusCode::FORBIDDEN,
             _ => StatusCode::BAD_REQUEST,
         }
     }

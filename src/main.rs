@@ -26,11 +26,19 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .app_data(Data::new(database::db::Database { db: pool.clone() }))
             .wrap(Logger::new("%a -> %r --- HTTP %s, took %Dms"))
-            .service(api::statistics::statistics)
+            .service(
+                actix_web::web::scope("")
+                    .service(api::statistics::statistics)
+            )
+            .service(
+                actix_web::web::scope("/user")
+                    .service(api::users::new_account)
+                    .service(api::users::login)
+            )
     })
     .bind(addr)
     .expect("failed to bind")
-    .workers(cfg.server.worker_amount.unwrap_or(1))
+    .workers(cfg.server.worker_amount.unwrap_or(2))
     .shutdown_timeout(10)
     .run()
     .await

@@ -10,7 +10,7 @@ pub struct StatisticsResponse {
     pub user_count: i64,
 }
 
-#[get("/users")]
+#[get("/")]
 pub async fn statistics(db: Data<Database>) -> Result<Json<StatisticsResponse>, UserError> {
     let result = block(move || db.get()?.get_total_users()).await??;
 

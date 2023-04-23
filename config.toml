@@ -1,6 +1,7 @@
 [server]
 host = "127.0.0.1"
 port = 8080
+worker_amount = 1
 
 [database]
-postgres_url = "postgres://derive:cloud@localhost:6969/derive-cloud"
+postgres_url = "postgres://lifetree:lifetree@localhost:6969/lifetree"
