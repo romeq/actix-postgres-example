@@ -29,10 +29,7 @@ pub trait Users {
     fn login(&mut self, user: UserLogin) -> Result<uuid::Uuid, UserError>;
     fn profile(&mut self, id: uuid::Uuid) -> Result<User, UserError>;
 }
-pub trait Files {
-    fn create_file(&mut self, file: super::files::File) -> Result<(), UserError>;
-}
 
-pub trait Controller: Statistics + Users + Files {}
+pub trait Controller: Statistics + Users {}
 
 impl Controller for PooledConnection<ConnectionManager<PgConnection>> {}
