@@ -3,7 +3,11 @@ use diesel::{
     PgConnection,
 };
 
-use crate::{errors::UserError, DbPool};
+use crate::{
+    errors::UserError,
+    models::{NewUser, User, UserLogin},
+    DbPool,
+};
 
 pub struct Database {
     pub db: DbPool,
@@ -21,9 +25,14 @@ pub trait Statistics {
     fn get_total_users(&mut self) -> Result<i64, UserError>;
 }
 pub trait Users {
-    fn create_user(&mut self, user: super::users::NewUserRequest) -> Result<(), UserError>;
-    fn login(&mut self, user: super::users::LoginRequest) -> Result<(), UserError>;
+    fn register(&mut self, user: NewUser) -> Result<uuid::Uuid, UserError>;
+    fn login(&mut self, user: UserLogin) -> Result<uuid::Uuid, UserError>;
+    fn profile(&mut self, id: uuid::Uuid) -> Result<User, UserError>;
 }
-pub trait Controller: Statistics + Users {}
+pub trait Files {
+    fn create_file(&mut self, file: super::files::File) -> Result<(), UserError>;
+}
+
+pub trait Controller: Statistics + Users + Files {}
 
 impl Controller for PooledConnection<ConnectionManager<PgConnection>> {}

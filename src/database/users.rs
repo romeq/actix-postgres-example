@@ -1,32 +1,16 @@
 use super::db::Users;
-use crate::errors::UserError::*;
+use crate::errors::UserError::{self, *};
+use crate::models::{NewUser, User, UserLogin};
+use diesel::SelectableHelper;
 use diesel::{
     r2d2::{ConnectionManager, PooledConnection},
     result::Error as DieselError,
     ExpressionMethods, PgConnection, QueryDsl, RunQueryDsl,
 };
 use rand::prelude::*;
-use serde::Deserialize;
-
-#[derive(Deserialize, diesel::prelude::Insertable)]
-#[diesel(table_name = crate::schema::users)]
-pub struct NewUserRequest {
-    username: String,
-    password: String,
-}
-
-#[derive(Deserialize, diesel::prelude::Insertable)]
-#[diesel(table_name = crate::schema::users)]
-pub struct LoginRequest {
-    username: String,
-    password: String,
-}
 
 impl Users for PooledConnection<ConnectionManager<PgConnection>> {
-    fn create_user(
-        &mut self,
-        user: super::users::NewUserRequest,
-    ) -> Result<(), crate::errors::UserError> {
+    fn register(&mut self, user: NewUser) -> Result<uuid::Uuid, UserError> {
         use crate::schema::users::dsl::*;
 
         let salt = &random::<[u8; 32]>();
@@ -34,29 +18,39 @@ impl Users for PooledConnection<ConnectionManager<PgConnection>> {
             argon2::hash_encoded(user.password.as_bytes(), salt, &Default::default()).unwrap();
 
         diesel::insert_into(users)
-            .values(NewUserRequest {
+            .values(NewUser {
                 username: user.username,
                 password: hash,
             })
-            .execute(self)
-            .map(|_| ())
+            .returning(user_id)
+            .get_result::<uuid::Uuid>(self)
             .map_err(|err| match err {
                 DieselError::DatabaseError(..) => UserAlreadyExistsOrRequestInvalid,
                 _ => crate::errors::UserError::InternalError,
             })
     }
 
-    fn login(&mut self, user: super::users::LoginRequest) -> Result<(), crate::errors::UserError> {
+    fn login(&mut self, user: UserLogin) -> Result<uuid::Uuid, UserError> {
         use crate::schema::users::dsl::*;
 
-        let password_hashed = users
-            .select(password)
+        let db_user = users
             .filter(username.eq(user.username))
-            .first::<String>(self)
+            .select((user_id, password))
+            .first::<(uuid::Uuid, String)>(self)
             .map_err(|_| InvalidRequest)?;
 
-        argon2::verify_encoded(&password_hashed.as_str(), user.password.as_bytes())
-            .map(|_| ())
+        argon2::verify_encoded(db_user.1.as_str(), user.password.as_bytes())
+            .map(|_| db_user.0)
             .map_err(|_| PermissionDenied)
+    }
+
+    fn profile(&mut self, id: uuid::Uuid) -> Result<User, UserError> {
+        use crate::schema::users::dsl::*;
+
+        users
+            .filter(user_id.eq(id))
+            .select(User::as_select())
+            .get_result::<User>(self)
+            .map_err(|_| UserError::InvalidRequest)
     }
 }

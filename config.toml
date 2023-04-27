@@ -4,4 +4,4 @@ port = 8080
 worker_amount = 1
 
 [database]
-postgres_url = "postgres://lifetree:lifetree@localhost:6969/lifetree"
+postgres_url = "postgres://valvo:valvo@localhost:6969/valvo"

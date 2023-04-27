@@ -4,7 +4,6 @@ CREATE TABLE IF NOT EXISTS users(
     created_at  TIMESTAMP       NOT NULL DEFAULT NOW(),
     updated_at  TIMESTAMP       NOT NULL DEFAULT NOW(),
     deleted_at  TIMESTAMP,
-    email       VARCHAR(256)    NOT NULL UNIQUE,
     username    VARCHAR(256)    NOT NULL UNIQUE,
     password    VARCHAR(512)    NOT NULL UNIQUE
 );

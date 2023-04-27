@@ -3,7 +3,7 @@ services:
     image: postgres
     restart: unless-stopped
     environment:
-      - POSTGRES_USER=lifetree
-      - POSTGRES_PASSWORD=lifetree
+      - POSTGRES_USER=valvo
+      - POSTGRES_PASSWORD=valvo
     ports:
       - "6969:5432"
